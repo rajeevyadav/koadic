@@ -28,6 +28,9 @@ class Handler(BaseHTTPRequestHandler):
         for key, value in headers.items():
             self.send_header(key, value)
 
+        self.send_header('Cache-Control', 'no-store, max-age=0')
+        self.send_header('If-Modified-Since', '0')
+
         self.end_headers()
 
         # python is so utterly incapable that we have to write CS 101 socket
