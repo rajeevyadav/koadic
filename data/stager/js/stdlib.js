@@ -1100,4 +1100,3 @@ Koadic.file.deleteFile = function(path)
     Koadic.FS.DeleteFile(Koadic.file.getPath(path), true);
 };
 //file.deleteFile.end
-Koadic.shell.run("rundll32.exe InetCpl.cpl,ClearMyTracksByProcess 264", false);

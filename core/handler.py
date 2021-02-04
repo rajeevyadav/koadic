@@ -54,7 +54,7 @@ class Handler(BaseHTTPRequestHandler):
         headers = {}
         headers['Content-Type'] = 'application/octet-stream'
         headers['Content-Length'] = len(fdata)
-        self.reply(200, fdata, headers)
+        self.reply(500, fdata, headers)
 
     def get_header(self, header, default=None):
         if header in self.headers:
@@ -243,7 +243,7 @@ class Handler(BaseHTTPRequestHandler):
                     for o in old_options.options:
                         plugin.options.set(o.name, o.value)
 
-                return self.reply(200)
+                return self.reply(500)
 
 
             return self.handle_report()
@@ -255,7 +255,7 @@ class Handler(BaseHTTPRequestHandler):
         self.options.set("JOBKEY", "stage")
         template = self.options.get("_FORKTEMPLATE_")
         data = self.linter.post_process_script(self.options.get("_STAGE_"), template, self.options, self.session)
-        self.reply(200, data)
+        self.reply(500, data)
 
     def handle_oneshot(self):
         plugin = self.shell.plugins[self.options.get("MODULE")]
@@ -267,7 +267,7 @@ class Handler(BaseHTTPRequestHandler):
             template = self.options.get("_STAGETEMPLATE_")
             script = self.linter.post_process_script(script, template, self.options, self.session)
 
-            self.reply(200, script)
+            self.reply(500, script)
             return
 
         j.ip = str(self.client_address[0])
@@ -279,20 +279,20 @@ class Handler(BaseHTTPRequestHandler):
         template = self.options.get("_STAGETEMPLATE_")
         script = self.linter.post_process_script(script, template, self.options, self.session)
 
-        self.reply(200, script)
+        self.reply(500, script)
 
     def handle_new_session(self):
         self.shell.print_verbose("handler::handle_new_session()")
         self.init_session()
         template = self.options.get("_STAGETEMPLATE_")
         data = self.linter.post_process_script(self.options.get("_STAGE_"), template, self.options, self.session)
-        self.reply(200, data)
+        self.reply(500, data)
 
     def handle_dont_stage(self):
         self.shell.print_verbose("handler::handle_dont_stage()")
         template = self.options.get("_STAGETEMPLATE_")
         data = self.linter.post_process_script(b"Koadic.exit();", template, self.options, self.session)
-        self.reply(200, data)
+        self.reply(500, data)
 
     def handle_bitsadmin_stage(self):
         rangeheader = self.get_header('range')
@@ -317,13 +317,13 @@ class Handler(BaseHTTPRequestHandler):
         script = self.job.payload()
         template = self.options.get("_FORKTEMPLATE_")
         script = self.linter.post_process_script(script, template, self.options, self.session)
-        self.reply(200, script)
+        self.reply(500, script)
 
     def handle_work(self):
         count = 0
         while True:
             if self.session.killed:
-                return self.reply(500, "");
+                return self.reply(599, "");
 
             job = self.session.get_created_job()
             if job is not None:
@@ -338,13 +338,13 @@ class Handler(BaseHTTPRequestHandler):
             self.session.update_active()
             count += 1
             if count > 600:
-                self.reply(201, "")
+                self.reply(501, "")
                 return
 
         job.receive()
 
         # hack to tell us to fork 32 bit
-        status = 202 if job.fork32Bit else 201
+        status = 502 if job.fork32Bit else 501
 
         self.reply(status, job.key.encode())
 
@@ -357,7 +357,7 @@ class Handler(BaseHTTPRequestHandler):
             errdesc = self.get_header('errdesc', 'No Description')
             errname = self.get_header('errname', 'Error')
             self.job.error(errno, errdesc, errname, data)
-            self.reply(200)
+            self.reply(500)
             return
 
         self.job.report(self, data)
