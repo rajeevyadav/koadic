@@ -1,6 +1,6 @@
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qs
+#from urllib.parse import parse_qs
 
 import cgi
 import socket
@@ -118,11 +118,25 @@ class Handler(BaseHTTPRequestHandler):
         self.options = copy.deepcopy(self.stager.options)
         return True
 
+    def parse_qs(self, qs):
+        params = {}
+        if len(qs) < 2:
+            return params
+        for p in qs[1].split(';'):
+            if not p:
+                break
+            pk = p.split('=', 1)[0]
+            pv = p.split('=', 1)[1]
+            if len(pv):
+                params[pk] = [pv]
+        return params
+
     def parse_params(self):
         splitted = self.path.split("?")
         if not self.find_stager(splitted):
             return False
-        self.get_params = parse_qs(splitted[1]) if len(splitted) > 1 else {}
+        #self.get_params = parse_qs(splitted[1]) if len(splitted) > 1 else {}
+        self.get_params = self.parse_qs(splitted)
 
         sessionname = self.options.get("SESSIONNAME")
 
