@@ -174,6 +174,11 @@ class Handler(BaseHTTPRequestHandler):
         elif self.shell.continuesession:
             self.session = self.shell.continuesession
 
+        if self.headers['user-agent']:
+            self.shell.print_verbose(f"handler::parse_params() - user_agent = {self.headers['user-agent']}")
+            if 'compatible' not in self.headers['user-agent'] and 'Microsoft BITS' not in self.headers['user-agent']:
+                self.shell.print_warning("Are you running this payload from a browser? Koadic payloads are not meant to be launched from a browser. If a zombie isn't staging and you're seeing this warning, please don't post a ticket on Github. Run the FULL payload as a command.")
+
         if self.headers['host']:
             self.shell.print_verbose(f"handler::parse_params() - Host header present: {self.headers['host']}")
             if ':' in self.headers['host']:
