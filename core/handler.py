@@ -124,9 +124,12 @@ class Handler(BaseHTTPRequestHandler):
             return params
         for p in qs[1].split(';'):
             if not p:
-                break
-            pk = p.split('=', 1)[0]
-            pv = p.split('=', 1)[1]
+                continue
+            pp = p.split('=', 1)
+            if len(pp) != 2:
+                continue
+            pk = pp[0]
+            pv = pp[1]
             if len(pv):
                 params[pk] = [pv]
         return params
