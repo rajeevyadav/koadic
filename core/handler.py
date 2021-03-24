@@ -110,8 +110,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def find_stager(self, splitted):
         self.endpoint = splitted[0].split("/")[1].split(".")[0]
+        self.shell.print_verbose(f"handler::find_stager() - endpoint identified = {self.endpoint}")
 
         if self.endpoint not in self.shell.stagers[self.port]:
+            self.shell.print_verbose(f"handler::find_stager() - could not find a listener on port {self.port} for this endpoint")
             return False
 
         self.stager = self.shell.stagers[self.port][self.endpoint]
@@ -135,6 +137,7 @@ class Handler(BaseHTTPRequestHandler):
         return params
 
     def parse_params(self):
+        self.shell.print_verbose(f"handler::parse_params() - path = {self.path}")
         splitted = self.path.split("?")
         if not self.find_stager(splitted):
             return False
